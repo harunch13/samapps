@@ -93,13 +93,13 @@
 
 	<distributionManagement>
 	    <repository>
-	      <id>nexus</id>
+	      <id>nexus-release</id>
 	      <name>TechLink Academy Releases Nexus Repository</name>
 	      <url>httphttp:http://nexus:8081/repository/release-sam/</url>
 	    </repository>
 	    
 	    <snapshotRepository>
-	      <id>nexus</id>
+	      <id>nexus-snapshot</id>
 	      <name>TechLink Academy Snapshot Nexus Repository </name>
 	      <url>httphttp:http://nexus:8081/repository/snapshot-sam/</url>
 	    </snapshotRepository>

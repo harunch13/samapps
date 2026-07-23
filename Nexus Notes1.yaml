@@ -1,0 +1,303 @@
+  ARTIFACTORY  
+  ===========
+  
+  
+1. GitHub Repo --> Java App
+2. Maven -->  (.jar, .war, .ear) 
+3. SonarQube --> Static code analysis | .war  
+                 Quality Gate
+4. Tomcat --> App Server (.war)
+5. Nexus --> Artifactory (repository manager, 
+             stores .war)
+
+SonarQube Summary:
+1. SonarQube is use to perform static code 
+   analysis.   
+
+2. We use SonarQube to perform static code 
+   quality analysis for our prjects    
+  SDLC =:
+  develop, build and deploy  
+
+- SonarQube Scanner
+- SonarQube server:
+   - Compute engine  
+   - Elasticsearch  
+   - Database 
+   - Web-server = serverIP:portNumber[9000] 
+              = userName/Password 
+              = token     
+
+Benchmark = Our standards for quality Software:
+Quality Profiles    
+Rules
+Quality GATE:
+  Conditions   
+1. Code coverage     > 85%  
+2. Duplicated lines  < 4%       
+3. vulnerabilities   < 1
+4. code smells       < 5 
+5. bugs              = 0
+6. Security hotspots = 0
+7. Use best practice for recommended coding 
+   standards.
+
+
+   NEXUS
+   =====  
+  Nexus Repository Manager:  often referred to as 
+  Nexus Artifactory, is a repository manager used 
+  for storing and managing software components. It 
+  provides functionalities such as
+  - dependency management, 
+  - build artifact storage, 
+  - releases, and distribution. 
+  It helps streamline the 
+  development workflow by offering a central 
+  location to store and retrieve binary components.
+
+  Rational:
+    What happens if we lost the packages in Maven?
+    What if we cannot access our packages?
+    What if the build server is crashes?
+
+  We need a disaster recovery strategy. 
+  We need to create backups for are artefacts. 
+  This is done by storing our artifacts 
+  (.war) in artifactory managers like 
+  Nexus.
+
+  Examples of Artifactory Managers
+
+  1.Nexus : - It is an open source artifactory 
+              manager.
+            - It is used to store and retrieve 
+              build artifacts (like java web apps .war)
+            - Nexus acts as a disaster recovery 
+              server for maven. 
+              (It is the Maven remote repository)
+            - Artifacts can be retrieved when ever 
+              needed.
+
+  2.JFrog: - It is also used to store and retrieve 
+             build artifacts.
+            - It is licensed.
+
+  3.Amazon CodeArtifacts: Also used to store and 
+            retrieve build artifacts. 
+
+  We support Java based application development. 
+
+  Workflow
+1. Maven Server:  
+  Maven Goals 
+    mvn package:  
+    This will validate, compile, test and create
+    artifacts in the target directory
+    mvn install: 
+    Creates and store artifacts in maven-local-
+    repo & target directory
+    MHD - /opt/maven/
+
+    mvn deploy: uploads the build artifacts to 
+    maven remote repository (Nexus)
+          - validate
+          - compile
+          - test
+          - create package in target directory
+          - Packages created in mavenlocalrepo   
+          - uploads THE PACKAGE to Nexus 
+            (Maven remote-repo) Nexus
+
+
+Nexus Installation: 
+Pre-requisite:
+Create Redhat EC2 t2.medium Instance with 4GB RAM.
+Create Security Group and open Required ports.
+8081
+Installation Script:
+sudo hostnamectl set-hostname nexus
+sudo useradd nexus
+sudo echo "nexus ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/nexus 
+sudo su - nexus
+cd /opt
+sudo yum install wget git nano unzip -y
+sudo mkdir -p /usr/lib/jvm
+sudo wget -O /tmp/openjdk11.tar.gz https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.22%2B7/OpenJDK11U-jdk_x64_linux_hotspot_11.0.22_7.tar.gz
+sudo tar -zxvf /tmp/openjdk11.tar.gz -C /usr/lib/jvm/
+sudo ln -s /usr/lib/jvm/jdk-11.0.22+7 /usr/lib/jvm/java-11-openjdk
+sudo rm -f /tmp/openjdk11.tar.gz
+/usr/lib/jvm/java-11-openjdk/bin/java -version
+sudo wget https://download.sonatype.com/nexus/3/nexus-3.82.0-08-linux-x86_64.tar.gz
+sudo tar -zxvf nexus-3.82.0-08-linux-x86_64.tar.gz
+sudo mv /opt/nexus-3.82.0-08 /opt/nexus
+sudo rm -rf nexus-3.82.0-08-linux-x86_64.tar.gz
+sudo chown -R nexus:nexus /opt/nexus
+sudo chown -R nexus:nexus /opt/sonatype-work
+sudo chmod -R 775 /opt/nexus
+sudo chmod -R 775 /opt/sonatype-work
+
+cat <<EOF | sudo tee /etc/systemd/system/nexus.service > /dev/null
+[Unit]
+Description=Sonatype Nexus Service
+After=network.target
+
+[Service]
+Type=forking
+LimitNOFILE=65536
+ExecStart=/opt/nexus/bin/nexus start
+ExecStop=/opt/nexus/bin/nexus stop
+User=nexus
+Group=nexus
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable nexus
+sudo systemctl start nexus
+
+sudo systemctl status nexus
+
+Default Port: 8081
+Default User: admin
+Password: cat /opt/sonatype-work/nexus3/admin.password
+
+
+
+Nexus Home directory:
+  /opt/nexus 
+    bin  = binary files [nexus]   
+    lib  = 
+    etc  = configuration files
+             nexus-default.properties  
+
+application-port=8081
+application-host=0.0.0.0
+nexus-args=${jetty.etc}/jetty.xml,${jetty.etc}/jetty-http.xml,${jetty.etc}/jetty-requestlog.xml
+nexus-context-path=/
+
+- default context path = /
+
+- change to /linkpay
+
+Login to Nexus: publicIP:8081/edith
+  Click on Settings: Server administration and configuration
+    Repositories: 
+      Create Repository: --> maven(hosted)
+                Name: techlink-snapshot
+                Name: techlink-releases
+                Version policy: Release | Snapshot | Mixed
+          Create Repository. Copy Url
+
+Snapshot url: http://16.170.235.46:8081/repository/boa-snapshot/
+Releases url: http://16.170.235.46:8081/repository/boa-release/
+
+Our objective is to upload and store artifacts in the 
+above repos. 
+
+To see existing repositories, click on the "browse" button. 
+
+Maven, Nexus integration: 
+  1. Create artifactories[maven-remote-repos] and add them 
+     in the "distributionMGT" tag in pom.xml 
+
+maven-remote-repo
+Snapshot repo url: 
+Releases repo url:
+  - To upload to the Snapshots repo, add -SNAPSHOT at version tag 
+    in pom.xml
+
+    <verion>0.0.1-SNAPSHOT</version>
+
+  - To upload to the Releases repo, delete -SNAPSHOT
+
+In  the MaveNServer, run:
+- mvn deploy
+
+To see our artifacts, on Nexus GUI -> Browse -> 
+Releases/Snapshot Repo  
+
+To allow new releases, go the releases repo
+  1. On Nexus GUI, 
+     Hosted:
+      Deployment policy:
+        Allow redeploy.
+
+  2. vi into pom.xml, change the version.
+
+MAVEN INSTALLATION:
+Inside Maven server
+
+#1 install Java openJDK 11+ as a pre-requisit
+   for maven to run.
+    sudo apt update
+    sudo hostnamectl set-hostname maven
+    sudo su - ubuntu
+    cd /opt
+    sudo apt install git-all -y
+    sudo apt install unzip -y
+    sudo apt install wget -y
+    sudo apt install openjdk-17-jdk -y
+    java -version
+    git --version
+
+
+#2. Download, Extract and Install Maven
+    sudo wget https://dlcdn.apache.org/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.zip
+    sudo unzip apache-maven-3.9.16-bin.zip
+    sudo rm -rf apache-maven-3.9.16-bin.zip
+    sudo mv apache-maven-3.9.16 maven
+
+#3 Set Environmental Variable -
+  echo 'export MAVEN_HOME=$HOME/maven' >> ~/.bash_profile
+  echo 'export PATH=$PATH:$MAVEN_HOME/bin' >> ~/.bash_profile
+  source ~/.bash_profile
+
+#4Run the command
+  mvn 
+
+#5 If  Environmental variable fails, use the below:
+vi ~/.bash_profile
+export MAVEN_HOME=/opt/maven
+export PATH=$PATH:$MAVEN_HOME/bin
+source ~/.bash_profile
+
+
+#5 Clone your Project from your Repository
+https://github.com/BrunoTechGh/JavawenApp.git
+
+#6 Edit your Project Model File
+Go to your distribution tag in ur Project Model
+and add your repositories there 
+
+#7 Add your user credentials to be able to Connect the two servers
+mkdir -p ~/.m2
+sudo vi ~/.m2/settings.xml
+
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <servers>
+    <server>
+      <id>nexus</id> <username>admin</username>
+      <password>asare</password>
+    </server>
+
+    <server>
+      <id>nexus</id> <username>admin</username>
+      <password>asare</password>
+    </server>
+  </servers>
+
+</settings>
+
+#8 Run the command again to build
+  mvn deploy 
+
+
+

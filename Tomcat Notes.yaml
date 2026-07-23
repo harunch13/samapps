@@ -1,0 +1,215 @@
+Introduction:
+
+APACHE TOMCAT:
+Tomcat or Apache Tomcat is a light weight, open 
+source web container used to deploy and run 
+java-based web applications. 
+It is developed by Apache Software Foundation (ASF). 
+
+What is Webserver: 
+A Web server is a program that uses HTTP 
+(Hypertext Transfer Protocol) protocol to serve 
+web content (HTML and static content) to users. 
+
+Examples: 
+- Apache HTTP server 
+- Nginx (pronounced engine X) 
+- IBM HTTP server (IHS) 
+- Oracle iplanet web server 
+- Internet Information Server (IIS) 
+
+What is an Application Server:
+An application server is a container upon which you 
+can build and expose business logic 
+and processes to client applications through various 
+protocols including HTTP in a n-tier architecture. 
+
+Examples: 
+- Apache Tomcat  --Apache 
+- JBoss/WildFly - RedHat 
+- WebLogic - Oracle 
+- WebSphere Application Server - IBM 
+- WebSphere Liberty Profile - IBM 
+- Galssfish 
+
+Tomcat installation:
+The Apache Tomcat software is downloadable as a zip 
+file which can be extracted and installed as follows 
+Windows 
+Step 1: Create the folder called Apache in any 
+directory and Unzip apache software into 
+that folder. 
+Step 2: Open the command prompt and execute the below
+commands. 
+>cd C:\DevOps\Apache\apache-tomcat-7.0.79\bin 
+>startup.bat (OR) > catalina.bat start ---> 
+ Starting the Tomcat server. 
+
+MAC/Linux: 
+sh startup.sh (OR)  sh catalina.sh start ---> 
+Starting the Tomcat server. 
+Once you execute the startup.sh, you will see below 
+screens. 
+
+Tomcat server is started successfully. 
+Use the below URL and open in browser. 
+http://localhost:8080 
+Note: Tomcat by default will run in 8080 port number. --------------------------------------------------------------------------------------------------------------------- 
+
+Tomcat Directory Structure: 
+
+Tomcat installation provides these directories: 
+
+- bin: for Tomcat's binaries and startup scripts.
+
+- conf: global configuration applicable to all the 
+webapps. 
+The default installation provides: 
+
+One Policy File: catalina.policy for specifying 
+security policy. 
+
+Two Properties Files: catalina.properties and 
+logging.properties.
+
+Four Configuration XML Files: server.xml 
+(Tomcat main configuration file), web.xml 
+(global web application deployment descriptors), 
+context.xml (global Tomcat-specific 
+configuration options) and tomcat-users.xml 
+(a database of user, password and role for 
+authentication and access control). 
+
+The conf also contain a sub-directory for each engine, 
+e.g., Catalina, which in turn contains a 
+sub-directory for each of its hosts, e.g., localhost. You can place the host-specific 
+context information (similar to context.xml, but named as webapp.xml for each webapp 
+under the host). 
+
+lib: Keeps the JAR-file that are available to all 
+webapps. The default installation include 
+servletapi.jar (Servlet), jasper.jar (JSP) and 
+jasper-el.jar (EL). You may also keep the JAR 
+files of external package here, such as MySQL 
+JDBC driver (mysql-connector-java-5.1.{xx}
+bin.jar)and JSTL (jstl.jar and standard.jar). 
+
+logs: contains the engine logfile Catalina.
+{yyyy-mm-dd}.log, host logfile localhost.{yyyy
+mmdd}. log, and other application logfiles such as 
+manger and host-manager. The access log (created by 
+the AccessLogValve) is also kept here. 
+
+webapps: the default appBase - web applications base 
+directory of the host localhost. 
+work: contains the translated servlet source files and classes of JSP/JSF. Organized in 
+hierarchy of engine name (Catalina), host name (localhost), webapp name, followed by the 
+Java classes package structure. 
+
+temp: temporary files. 
+
+
+How to change the port number in Tomcat:
+(cd /opt/tomcat9/conf) --> vi server.xml
+Go to the conf directory and open the server.xml 
+and you will find below lines. 
+
+<Connector port="8080" protocol="HTTP/1.1" 
+connectionTimeout="20000" 
+redirectPort="8443" /> 
+Replace the 8080 with any port number.  
+
+after changing the port, stop tomcat and start it 
+all over. 
+cd /opt/tomcat9/bin
+sh catalina.sh stop   or sh shutdown.sh
+sh catalina.sh start  or sh startup.sh
+
+MAC/Linux: 
+shutdown.sh (OR) > catalina.sh stop  
+
+Tomcat Installation:
+
+Apache Tomcat Installation And Setup In AWS EC2 
+Redhat Instnace.
+
+Prerequisite:
+- AWS Acccount.
+   - Create Redhat EC2 T2.micro Instnace.
+   - Create Security Group and open Tomcat ports 
+     Required ports. --> 8080 ..etc
+   - Attach Security Group to EC2 Instance.
+
+- Install java openJDK 1.8+
+- Install Java JDK 1.8+ & Tomcat version 9.0.55
+# change hostname to tomcat:
+
+sudo hostnamectl set-hostname tomcat
+sudo su - ec2-user
+cd /opt
+# install Java JDK 1.8+ as a pre-requisit for tomcat to run.
+sudo yum install git wget unzip vim -y
+sudo mkdir -p /usr/lib/jvm
+sudo wget -O /tmp/openjdk11.tar.gz https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.22%2B7/OpenJDK11U-jdk_x64_linux_hotspot_11.0.22_7.tar.gz
+sudo tar -zxvf /tmp/openjdk11.tar.gz -C /usr/lib/jvm/
+sudo ln -s /usr/lib/jvm/jdk-11.0.22+7 /usr/lib/jvm/java-11-openjdk
+
+# Install Tomcat version 9.0.86
+# Download and extract the tomcat server
+sudo wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.118/bin/apache-tomcat-9.0.118.zip
+sudo unzip apache-tomcat-9.0.118.zip
+sudo rm -rf apache-tomcat-9.0.118.zip
+# Rename tomcat for good naming convention
+sudo mv apache-tomcat-9.0.118 tomcat9
+
+# Assign executable permissions to the tomcat 
+  home directory
+sudo chmod 777 -R /opt/tomcat9
+sudo chown ec2-user -R /opt/tomcat9
+
+# Start tomcat
+sh /opt/tomcat9/bin/startup.sh
+# create a soft link to start and stop tomcat
+# This will enable us to manage tomcat as a service
+
+sudo ln -s /opt/tomcat9/bin/startup.sh /usr/bin/starttomcat
+sudo ln -s /opt/tomcat9/bin/shutdown.sh /usr/bin/stoptomcat
+starttomcat
+sudo su - ec2-user
+
+Tomcat default port is 8080
+On your browser: publicIP:8080 To get public IP 
+(curl ifconfig.me / curl wgetip.com) 
+
+Deployment in tomcat takes place in the 
+webapps Directory:
+/opt/tomcat9/webapps/
+
+
+
+Configuration of the Tomcat Server
+===================================
+
+1. Enable external tomcat mgt access:
+By default tomcat can only be managed from localhost
+
+vim /opt/tomcat9/webapps/manager/META-INF/context.xml
+from:
+<Valve className="org.apache.catalina.valves.RemoteAddrValve"
+allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /
+to:
+<!--
+<Valve className="org.apache.catalina.valves.RemoteAddrValve"
+allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /
+-->
+
+2. Create tomcat users with access roles:
+vim /opt/tomcat9/conf/tomcat-users.xml # to add user
+vim /opt/tomcat9/conf/tomcat-users.xml
+
+
+<user username="samuel" password="fineboye" roles="manager-gui,admin-gui,manager-script"/>
+<user username="asare" password="fineboye" roles="admin-gui"/>
+
+GitHub Repository
+https://github.com/BrunoTechGh/brunoApp.git

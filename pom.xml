@@ -95,13 +95,13 @@
 	    <repository>
 	      <id>nexus</id>
 	      <name>TechLink Academy Releases Nexus Repository</name>
-	      <url>httphttp:http://localhost:8081/repository/release-sam/</url>
+	      <url>httphttp:http://nexus:8081/repository/release-sam/</url>
 	    </repository>
 	    
 	    <snapshotRepository>
 	      <id>nexus</id>
 	      <name>TechLink Academy Snapshot Nexus Repository </name>
-	      <url>httphttp:http://localhost:9000/repository/snapshot-sam/</url>
+	      <url>httphttp:http://nexus:8081/repository/snapshot-sam/</url>
 	    </snapshotRepository>
 	    
 	</distributionManagement>
